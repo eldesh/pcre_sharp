@@ -1,0 +1,18 @@
+_require "basis.smi"
+_require "ffi.smi"
+_require "pcre_raw.smi"
+_require "smlunitlib.smi"
+
+structure Pcre =
+struct
+  type pcre      (= ptr)
+  type extra     (= ptr)
+  type jit_stack (= ptr)
+  type table     (= boxed)
+  type t         (= ptr)
+  
+  val exec : pcre * extra option * string * int * int * int array -> int
+
+  val version : string
+end
+
