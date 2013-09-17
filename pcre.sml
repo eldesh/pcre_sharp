@@ -123,29 +123,21 @@ in
       val err = ref ""
       val errpos = ref 0
       val regex = R.pcre_compile (re, 0, err, errpos, NONE)
-      (*
-      val E.Right (cnt, arr) = capture_count regex >>= (fn cnt =>
-      *)
-      val xxs = Array.array(2*3, 0)
-      val E.Right (cnt, arr) = E.Right 0 >>= (fn cnt =>
-                (print (concat["capture count:", Int.toString cnt, "\n"]);
-                 E.Right (cnt, xxs)
-                (*
-                 E.Right (cnt, (Array.array((1+cnt)*3, 0)))
-                 *)
-                ))
-                (*
-      val _ = print (concat["cnt:", Int.toString cnt, "\n"])
-      *)
-      val ret = exec (regex, NONE, str, 0, 0, arr)
     in
-      print (concat["ret:", Int.toString ret, " ", arrayToString arr, "\n"]);
-      if ret=cnt
-      then let val idx = 2 * (cnt-1)
-           in E.Right $ String.extract(str, sub(arr,idx)
-                                     , SOME(sub(arr,idx+1)-sub(arr,idx)))
-           end
-      else E.Left ret
+      capture_count regex >>= (fn cnt =>
+        let
+          val _ = print (concat["capture count:", Int.toString cnt, "\n"])
+          val arr = Array.array((1+cnt)*3, 0)
+          val ret = exec (regex, NONE, str, 0, 0, arr)
+        in
+          print (concat["ret:", Int.toString ret, " ", arrayToString arr, "\n"]);
+          if ret=1+cnt
+          then let val idx = 2 * cnt
+               in E.Right $ String.extract(str, sub(arr,idx)
+                                         , SOME(sub(arr,idx+1)-sub(arr,idx)))
+               end
+          else E.Left ret
+        end)
     end
    
   structure Open =
@@ -157,7 +149,6 @@ in
 end (* local *)
 end
 
-(*
 (* sample code *)
 local
   open Pcre Pcre.Open
@@ -182,5 +173,4 @@ in
       test (pattern =~ subject)
     end
 end
-*)
 
