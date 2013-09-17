@@ -1,0 +1,226 @@
+_require "basis.smi"
+_require "ffi.smi"
+
+structure PcreRaw =
+struct
+  type pcre           (= ptr)
+  type pcre_extra     = unit ptr
+  type pcre_jit_stack (= ptr)
+  type table          (= boxed)
+  type t              (= ptr)
+
+  val PCRE_CASELESS          : word
+  val PCRE_MULTILINE         : word
+  val PCRE_DOTALL            : word
+  val PCRE_EXTENDED          : word
+  val PCRE_ANCHORED          : word
+  val PCRE_DOLLAR_ENDONLY    : word
+  val PCRE_EXTRA             : word
+  val PCRE_NOTBOL            : word
+  val PCRE_NOTEOL            : word
+  val PCRE_UNGREEDY          : word
+  val PCRE_NOTEMPTY          : word
+  val PCRE_UTF8              : word
+  val PCRE_UTF16             : word
+  val PCRE_NO_AUTO_CAPTURE   : word
+  val PCRE_NO_UTF8_CHECK     : word
+  val PCRE_NO_UTF16_CHECK    : word
+  val PCRE_AUTO_CALLOUT      : word
+  val PCRE_PARTIAL_SOFT      : word
+  val PCRE_PARTIAL           : word
+  val PCRE_DFA_SHORTEST      : word
+  val PCRE_DFA_RESTART       : word
+  val PCRE_FIRSTLINE         : word
+  val PCRE_DUPNAMES          : word
+  val PCRE_NEWLINE_CR        : word
+  val PCRE_NEWLINE_LF        : word
+  val PCRE_NEWLINE_CRLF      : word
+  val PCRE_NEWLINE_ANY       : word
+  val PCRE_NEWLINE_ANYCRLF   : word
+  val PCRE_BSR_ANYCRLF       : word
+  val PCRE_BSR_UNICODE       : word
+  val PCRE_JAVASCRIPT_COMPAT : word
+  val PCRE_NO_START_OPTIMIZE : word
+  val PCRE_NO_START_OPTIMISE : word
+  val PCRE_PARTIAL_HARD      : word
+  val PCRE_NOTEMPTY_ATSTART  : word
+  val PCRE_UCP               : word
+
+  structure ErrorCode =
+  struct
+    type t = int
+    val PCRE_ERROR_NOMATCH        : int
+    val PCRE_ERROR_NULL           : int
+    val PCRE_ERROR_BADOPTION      : int
+    val PCRE_ERROR_BADMAGIC       : int
+    val PCRE_ERROR_UNKNOWN_OPCODE : int
+    val PCRE_ERROR_UNKNOWN_NODE   : int
+    val PCRE_ERROR_NOMEMORY       : int
+    val PCRE_ERROR_NOSUBSTRING    : int
+    val PCRE_ERROR_MATCHLIMIT     : int
+    val PCRE_ERROR_CALLOUT        : int
+    val PCRE_ERROR_BADUTF8        : int
+    val PCRE_ERROR_BADUTF8_OFFSET : int
+    val PCRE_ERROR_PARTIAL        : int
+    val PCRE_ERROR_BADPARTIAL     : int
+    val PCRE_ERROR_INTERNAL       : int
+    val PCRE_ERROR_BADCOUNT       : int
+    val PCRE_ERROR_DFA_UITEM      : int
+    val PCRE_ERROR_DFA_UCOND      : int
+    val PCRE_ERROR_DFA_UMLIMIT    : int
+    val PCRE_ERROR_DFA_WSSIZE     : int
+    val PCRE_ERROR_DFA_RECURSE    : int
+    val PCRE_ERROR_RECURSIONLIMIT : int
+    val PCRE_ERROR_NULLWSLIMIT    : int
+    val PCRE_ERROR_BADNEWLINE     : int
+    val PCRE_ERROR_BADOFFSET      : int
+    val PCRE_ERROR_SHORTUTF8      : int
+
+    val PCRE_UTF8_ERR0            : int
+    val PCRE_UTF8_ERR1            : int
+    val PCRE_UTF8_ERR2            : int
+    val PCRE_UTF8_ERR3            : int
+    val PCRE_UTF8_ERR4            : int
+    val PCRE_UTF8_ERR5            : int
+    val PCRE_UTF8_ERR6            : int
+    val PCRE_UTF8_ERR7            : int
+    val PCRE_UTF8_ERR8            : int
+    val PCRE_UTF8_ERR9            : int
+    val PCRE_UTF8_ERR10           : int
+    val PCRE_UTF8_ERR11           : int
+    val PCRE_UTF8_ERR12           : int
+    val PCRE_UTF8_ERR13           : int
+    val PCRE_UTF8_ERR14           : int
+    val PCRE_UTF8_ERR15           : int
+    val PCRE_UTF8_ERR16           : int
+    val PCRE_UTF8_ERR17           : int
+    val PCRE_UTF8_ERR18           : int
+    val PCRE_UTF8_ERR19           : int
+    val PCRE_UTF8_ERR20           : int
+    val PCRE_UTF8_ERR21           : int
+
+    val PCRE_UTF16_ERR0           : int
+    val PCRE_UTF16_ERR1           : int
+    val PCRE_UTF16_ERR2           : int
+    val PCRE_UTF16_ERR3           : int
+    val PCRE_UTF16_ERR4           : int
+  end
+
+  val PCRE_INFO_OPTIONS         : int
+  val PCRE_INFO_SIZE            : int
+  val PCRE_INFO_CAPTURECOUNT    : int
+  val PCRE_INFO_BACKREFMAX      : int
+  val PCRE_INFO_FIRSTBYTE       : int
+  val PCRE_INFO_FIRSTCHAR       : int
+  val PCRE_INFO_FIRSTTABLE      : int
+  val PCRE_INFO_LASTLITERAL     : int
+  val PCRE_INFO_NAMEENTRYSIZE   : int
+  val PCRE_INFO_NAMECOUNT       : int
+  val PCRE_INFO_NAMETABLE       : int
+  val PCRE_INFO_STUDYSIZE       : int
+  val PCRE_INFO_DEFAULT_TABLES  : int
+  val PCRE_INFO_OKPARTIAL       : int
+  val PCRE_INFO_JCHANGED        : int
+  val PCRE_INFO_HASCRORLF       : int
+  val PCRE_INFO_MINLENGTH       : int
+  val PCRE_INFO_JIT             : int
+  val PCRE_INFO_JITSIZE         : int
+  val PCRE_INFO_MAXLOOKBEHIND   : int
+
+  val PCRE_CONFIG_UTF8                   : int
+  val PCRE_CONFIG_NEWLINE                : int
+  val PCRE_CONFIG_LINK_SIZE              : int
+  val PCRE_CONFIG_POSIX_MALLOC_THRESHOLD : int
+  val PCRE_CONFIG_MATCH_LIMIT            : int
+  val PCRE_CONFIG_STACKRECURSE           : int
+  val PCRE_CONFIG_UNICODE_PROPERTIES     : int
+  val PCRE_CONFIG_MATCH_LIMIT_RECURSION  : int
+  val PCRE_CONFIG_BSR                    : int
+  val PCRE_CONFIG_JIT                    : int
+  val PCRE_CONFIG_UTF16                  : int
+  val PCRE_CONFIG_JITTARGET              : int
+
+  val PCRE_STUDY_JIT_COMPILE              : word
+  val PCRE_STUDY_JIT_PARTIAL_SOFT_COMPILE : word
+  val PCRE_STUDY_JIT_PARTIAL_HARD_COMPILE : word
+
+  val PCRE_EXTRA_STUDY_DATA            : word
+  val PCRE_EXTRA_MATCH_LIMIT           : word
+  val PCRE_EXTRA_CALLOUT_DATA          : word
+  val PCRE_EXTRA_TABLES                : word
+  val PCRE_EXTRA_MATCH_LIMIT_RECURSION : word
+  val PCRE_EXTRA_MARK                  : word
+  val PCRE_EXTRA_EXECUTABLE_JIT        : word
+
+  (* unsafe interfaces.
+   * use pcre_compile2
+  val pcre_compile_ptr
+    : string * int * string ref * int ref * 'a ptr -> pcre
+
+  val pcre_compile_array
+    : string * int * string ref * int ref * word8 vector -> pcre
+  *)
+
+  val pcre_compile 
+    : string * int * string ref * int ref * word8 vector option -> pcre
+
+  (* unsafe interfaces.
+   * use pcre_compile2
+  val pcre_compile2_ptr
+    : string * int * int ref * string ref * int ref * 'a ptr -> pcre
+
+  val pcre_compile2_array
+    : string * int * int ref * string ref * int ref * word8 vector -> pcre
+  *)
+
+  val pcre_compile2 
+    : string * int * int ref * string ref * int ref * word8 vector option -> pcre
+
+  val pcre_config : int * unit ptr -> int
+
+  val pcre_study : string * int * string ref -> pcre_extra
+
+  val pcre_free_study : pcre_extra -> unit
+
+  val pcre_version : unit -> string
+
+  val pcre_free : pcre -> unit
+
+  val pcre_exec
+    : pcre * pcre_extra * string * int * int * int * int array * int -> int
+
+  val pcre_dfa_exec
+    : pcre * pcre_extra * string * int * int * int * int array * int * int array * int -> int
+
+  val pcre_copy_named_substring
+    : string * string * int array * int * string * char array * int -> int
+
+  val pcre_copy_substring
+	: string * int array * int * int * char array * int -> int
+
+  val pcre_get_named_substring
+    : pcre * string * int array * int * string * string ref -> int
+
+  val pcre_get_stringnumber
+    : pcre * string -> int
+
+  val pcre_get_stringtable_entries
+    : pcre * string * char ptr ref * char ptr ref -> int
+
+  val pcre_get_substring
+	: string * int array * int * int * string ref -> int
+
+  val pcre_get_substring_list
+    : string * int array * int * string array ref -> int
+
+  val pcre_maketables : unit -> table
+
+  val pcre_refcount : pcre * int -> int
+
+  val pcre_fullinfo
+    : pcre * pcre_extra * int * 'a ref -> int
+
+  val pcre_pattern_to_host_byte_order
+    : pcre * pcre_extra * Word8.word array -> int
+end
+
