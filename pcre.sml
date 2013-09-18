@@ -122,7 +122,7 @@ in
 
   fun match str pattern =
     case compile (pattern, 0, NONE)
-      of E.Right regex => E.Right $ exec (regex, NONE, str, 0, 0)
+      of E.Right regex => E.Right $ exec (regex, NONE, str, 0, 0) before R.pcre_free regex
        | E.Left  err   => E.Left err
    
   structure Open =
