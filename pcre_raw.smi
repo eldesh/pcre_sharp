@@ -3,11 +3,11 @@ _require "ffi.smi"
 
 structure PcreRaw =
 struct
-  type pcre           (= ptr)
+  type pcre           = unit ptr
   type pcre_extra     = unit ptr
   type pcre_jit_stack (= ptr)
   type table          (= boxed)
-  type t              (= ptr)
+  type t              = pcre
 
   val PCRE_CASELESS          : word
   val PCRE_MULTILINE         : word

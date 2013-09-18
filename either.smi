@@ -1,0 +1,14 @@
+_require "basis.smi"
+
+structure Either =
+struct
+  datatype ('a, 'b) t = Right of 'b | Left of 'a
+
+  val isRight : ('a, 'b) t -> bool
+  val isLeft  : ('a, 'b) t -> bool
+  val sum : ('a -> 'c) -> ('b -> 'c) -> ('a, 'b) t -> 'c
+
+  val return : 'b -> ('a, 'b) t
+  val bind : ('a, 'b) t -> ('b -> ('a, 'c) t) -> ('a, 'c) t
+end
+

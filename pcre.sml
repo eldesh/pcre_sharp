@@ -4,23 +4,6 @@
  *
  *)
 
-structure Either =
-struct
-  datatype ('a, 'b) t = Right of 'b | Left of 'a
-  fun isRight (Right _) = true
-    | isRight _         = false
-  fun isLeft (Left _) = true
-    | isLeft _        = false
-
-  fun sum left right (Right x) = right x
-    | sum left right (Left  x) = left  x
-
-  fun return x = Right x
-
-  fun bind (Right x) f = f x
-    | bind (Left  x) _ = Left x
-end
-
 structure Pcre =
 struct
 local
@@ -63,32 +46,48 @@ in
       E.Right (!cnt))
     end
 
-  fun exec (code, extra, subject, startoffset, option, ovector) =
+  exception Error of R.ErrorCode.t
+
+  fun unfoldr f e =
+    case f e
+      of SOME(x,e) => x::unfoldr f e
+       | NONE => []
+
+  fun exec (code, extra, subject, startoffset, option) =
     let val extra = maybe (Ptr.NULL()) id extra
     in
-      R.pcre_exec (code, extra, subject, size subject
-      , startoffset, option, ovector, Array.length ovector)
+      case capture_count code
+        of E.Left n    => raise Error n
+         | E.Right cnt =>
+            let
+              val ovector = Array.array((1+cnt)*3, 0)
+              val ret = R.pcre_exec (code, extra, subject, size subject
+                          , startoffset, option, ovector, Array.length ovector)
+            in
+              (* print $ concat["ret:",Int.toString ret,"\n"]; *)
+              if 0 < ret
+              then
+                let val vec = Array.vector ovector
+                    val sub = Vector.sub
+                    fun ext str (from,to) = String.extract (str, from, SOME(to-from))
+                    fun go i = if (cnt+1) * 2 <= i then NONE
+                               else SOME (ext subject (sub(vec,i), sub(vec,i+1)),i+2)
+                in unfoldr go 0
+                end
+              else
+                if ret=R.ErrorCode.PCRE_ERROR_NOMATCH then []
+                else
+                  case List.find (fn err=> err=ret)
+                            [ R.ErrorCode.PCRE_ERROR_NULL
+                            , R.ErrorCode.PCRE_ERROR_BADOPTION
+                            , R.ErrorCode.PCRE_ERROR_BADMAGIC
+                            , R.ErrorCode.PCRE_ERROR_UNKNOWN_NODE
+                            , R.ErrorCode.PCRE_ERROR_NOMEMORY
+                            ]
+                    of SOME code => raise Error code
+                     | NONE      => raise Fail "Pcre.exec"
+            end
     end
-
-
-    (*
-  datatype study = JIT_COMPILE
-                 | JIT_PARTIAL_HARD_COMPILE
-                 | JIT_PARTIAL_SOFT_COMPILE
-
-  fun studyToInt x =
-    case x
-      of JIT_COMPILE              => R.PCRE_STUDY_JIT_COMPILE
-       | JIT_PARTIAL_HARD_COMPILE => R.PCRE_STUDY_JIT_PARTIAL_HARD_COMPILE
-       | JIT_PARTIAL_SOFT_COMPILE => R.PCRE_STUDY_JIT_PARTIAL_SOFT_COMPILE
-
-  fun study (re, study:study) =
-    let
-      val err = ref ""
-    in
-      R.pcre_study (re, studyToInt study, err)
-    end
-    *)
 
   local structure S = ArraySlice
   in
@@ -111,39 +110,25 @@ in
            , ">"
            ]
 
-  (**
-   * match pattern that have zero or one capturing subpattern
-   * e.g.
-   * "foo (bar)"
-   * "192.168.0.(\\d+)"
-   *)
-  fun match_one str re =
+  fun compile (pattern, option, table) =
     let
-      val sub = Array.sub
-      val err = ref ""
-      val errpos = ref 0
-      val regex = R.pcre_compile (re, 0, err, errpos, NONE)
+      val (errmsg, erroffset) = (ref "", ref 0)
+      val ret = R.pcre_compile (pattern, option, errmsg, erroffset, table)
     in
-      capture_count regex >>= (fn cnt =>
-        let
-          val _ = print (concat["capture count:", Int.toString cnt, "\n"])
-          val arr = Array.array((1+cnt)*3, 0)
-          val ret = exec (regex, NONE, str, 0, 0, arr)
-        in
-          print (concat["ret:", Int.toString ret, " ", arrayToString arr, "\n"]);
-          if ret=1+cnt
-          then let val idx = 2 * cnt
-               in E.Right $ String.extract(str, sub(arr,idx)
-                                         , SOME(sub(arr,idx+1)-sub(arr,idx)))
-               end
-          else E.Left ret
-        end)
+      if Ptr.isNull ret
+      then E.Left {msg= !errmsg, pos= !erroffset}
+      else E.Right ret
     end
+
+  fun match str pattern =
+    case compile (pattern, 0, NONE)
+      of E.Right regex => E.Right $ exec (regex, NONE, str, 0, 0)
+       | E.Left  err   => E.Left err
    
   structure Open =
   struct
     type t = R.t
-    fun str =~ re = match_one str re
+    fun str =~ re = match str re
   end
   open Open
 end (* local *)
@@ -154,23 +139,34 @@ local
   open Pcre Pcre.Open
   structure E = Either
   infix =~
-  fun maybe none f (SOME x) = f x
-    | maybe none f NONE = none
   fun println s = print(s^"\n")
+  val test = println o (E.sum (fn _=> "<not match>")
+                              (fn xs=> "match!("^(String.concatWith "," xs)^")"))
+  fun getLineWith prompt () =
+    (print (prompt^"> ");
+     let val str = valOf (TextIO.inputLine TextIO.stdIn)
+     in
+       String.extract (str, 0, SOME(size str-1))
+     end
+    )
 in
   val _ =
+    while true do
+    (let
+       val subject = getLineWith "subject" ()
+       val pattern = getLineWith "pattern" ()
+     in
+       println (concat["<", subject, " =~ ", pattern, ">"]);
+       test (subject =~ pattern)
+     end)
+    (*
     let
-      (*
-      val subject = "#314"
-      val pattern = "#314 #314"
-      *)
-      val subject = "fixes #(\\d+)"
-      val pattern = "fixes #314"
-      val test = println o (E.sum (fn _=> "<not match>")
-                                  (fn x=> "match!("^x^")"))
+      val subject = "fixes #314"
+      val pattern = "fixes #(\\d+)"
     in
-      println (concat[subject, " =~ ", pattern]);
+      println (concat[pattern, " =~ ", subject]);
       test (pattern =~ subject)
     end
+    *)
 end
 

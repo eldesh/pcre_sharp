@@ -1,18 +1,24 @@
 _require "basis.smi"
 _require "ffi.smi"
 _require "pcre_raw.smi"
-_require "smlunitlib.smi"
+_require "either.smi"
 
 structure Pcre =
 struct
   type pcre      (= ptr)
   type extra     (= ptr)
-  type jit_stack (= ptr)
-  type table     (= boxed)
-  type t         (= ptr)
+  type t          = pcre
   
-  val exec : pcre * extra option * string * int * int * int array -> int
+(*
+  val match : string -> string -> ({msg:string, pos:int}, string list) Either.t
+*)
 
   val version : string
+
+  structure Open =
+  struct
+    type t = t
+    val =~ : string * string -> ({msg:string, pos:int}, string list) Either.t
+  end
 end
 
