@@ -9,42 +9,46 @@ struct
   type table          (= boxed)
   type t              = pcre
 
-  val PCRE_CASELESS          : word
-  val PCRE_MULTILINE         : word
-  val PCRE_DOTALL            : word
-  val PCRE_EXTENDED          : word
-  val PCRE_ANCHORED          : word
-  val PCRE_DOLLAR_ENDONLY    : word
-  val PCRE_EXTRA             : word
-  val PCRE_NOTBOL            : word
-  val PCRE_NOTEOL            : word
-  val PCRE_UNGREEDY          : word
-  val PCRE_NOTEMPTY          : word
-  val PCRE_UTF8              : word
-  val PCRE_UTF16             : word
-  val PCRE_NO_AUTO_CAPTURE   : word
-  val PCRE_NO_UTF8_CHECK     : word
-  val PCRE_NO_UTF16_CHECK    : word
-  val PCRE_AUTO_CALLOUT      : word
-  val PCRE_PARTIAL_SOFT      : word
-  val PCRE_PARTIAL           : word
-  val PCRE_DFA_SHORTEST      : word
-  val PCRE_DFA_RESTART       : word
-  val PCRE_FIRSTLINE         : word
-  val PCRE_DUPNAMES          : word
-  val PCRE_NEWLINE_CR        : word
-  val PCRE_NEWLINE_LF        : word
-  val PCRE_NEWLINE_CRLF      : word
-  val PCRE_NEWLINE_ANY       : word
-  val PCRE_NEWLINE_ANYCRLF   : word
-  val PCRE_BSR_ANYCRLF       : word
-  val PCRE_BSR_UNICODE       : word
-  val PCRE_JAVASCRIPT_COMPAT : word
-  val PCRE_NO_START_OPTIMIZE : word
-  val PCRE_NO_START_OPTIMISE : word
-  val PCRE_PARTIAL_HARD      : word
-  val PCRE_NOTEMPTY_ATSTART  : word
-  val PCRE_UCP               : word
+  structure Opt =
+  struct
+    type t = word
+    val PCRE_CASELESS          : word
+    val PCRE_MULTILINE         : word
+    val PCRE_DOTALL            : word
+    val PCRE_EXTENDED          : word
+    val PCRE_ANCHORED          : word
+    val PCRE_DOLLAR_ENDONLY    : word
+    val PCRE_EXTRA             : word
+    val PCRE_NOTBOL            : word
+    val PCRE_NOTEOL            : word
+    val PCRE_UNGREEDY          : word
+    val PCRE_NOTEMPTY          : word
+    val PCRE_UTF8              : word
+    val PCRE_UTF16             : word
+    val PCRE_NO_AUTO_CAPTURE   : word
+    val PCRE_NO_UTF8_CHECK     : word
+    val PCRE_NO_UTF16_CHECK    : word
+    val PCRE_AUTO_CALLOUT      : word
+    val PCRE_PARTIAL_SOFT      : word
+    val PCRE_PARTIAL           : word
+    val PCRE_DFA_SHORTEST      : word
+    val PCRE_DFA_RESTART       : word
+    val PCRE_FIRSTLINE         : word
+    val PCRE_DUPNAMES          : word
+    val PCRE_NEWLINE_CR        : word
+    val PCRE_NEWLINE_LF        : word
+    val PCRE_NEWLINE_CRLF      : word
+    val PCRE_NEWLINE_ANY       : word
+    val PCRE_NEWLINE_ANYCRLF   : word
+    val PCRE_BSR_ANYCRLF       : word
+    val PCRE_BSR_UNICODE       : word
+    val PCRE_JAVASCRIPT_COMPAT : word
+    val PCRE_NO_START_OPTIMIZE : word
+    val PCRE_NO_START_OPTIMISE : word
+    val PCRE_PARTIAL_HARD      : word
+    val PCRE_NOTEMPTY_ATSTART  : word
+    val PCRE_UCP               : word
+  end
 
   structure ErrorCode =
   struct
@@ -153,28 +157,28 @@ struct
   val PCRE_EXTRA_EXECUTABLE_JIT        : word
 
   (* unsafe interfaces.
-   * use pcre_compile2
+   * use pcre_compile
   val pcre_compile_ptr
-    : string * int * string ref * int ref * 'a ptr -> pcre
+    : string * word * string ref * int ref * 'a ptr -> pcre
 
   val pcre_compile_array
-    : string * int * string ref * int ref * word8 vector -> pcre
+    : string * word * string ref * int ref * word8 vector -> pcre
   *)
 
   val pcre_compile 
-    : string * int * string ref * int ref * word8 vector option -> pcre
+    : string * word * string ref * int ref * word8 vector option -> pcre
 
   (* unsafe interfaces.
    * use pcre_compile2
   val pcre_compile2_ptr
-    : string * int * int ref * string ref * int ref * 'a ptr -> pcre
+    : string * word * int ref * string ref * int ref * 'a ptr -> pcre
 
   val pcre_compile2_array
-    : string * int * int ref * string ref * int ref * word8 vector -> pcre
+    : string * word * int ref * string ref * int ref * word8 vector -> pcre
   *)
 
   val pcre_compile2 
-    : string * int * int ref * string ref * int ref * word8 vector option -> pcre
+    : string * word * int ref * string ref * int ref * word8 vector option -> pcre
 
   val pcre_config : int * unit ptr -> int
 
@@ -187,10 +191,10 @@ struct
   val pcre_free : pcre -> unit
 
   val pcre_exec
-    : pcre * pcre_extra * string * int * int * int * int array * int -> int
+    : pcre * pcre_extra * string * int * int * word * int array * int -> int
 
   val pcre_dfa_exec
-    : pcre * pcre_extra * string * int * int * int * int array * int * int array * int -> int
+    : pcre * pcre_extra * string * int * int * word * int array * int * int array * int -> int
 
   val pcre_copy_named_substring
     : string * string * int array * int * string * char array * int -> int

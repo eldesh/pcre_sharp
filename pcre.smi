@@ -5,20 +5,83 @@ _require "either.smi"
 
 structure Pcre =
 struct
-  type pcre      (= ptr)
-  type extra     (= ptr)
-  type t          = pcre
+  type pcre  (= ptr)
+  type extra (= ptr)
+  type table (= boxed)
+  type t      = pcre
   
+  structure Opt =
+  struct
+    type t (= word)
+    val compose : t -> t -> t
+
+    val EMPTY              : t
+    val CASELESS           : t
+    val MULTILINE          : t
+    val DOTALL             : t
+    val EXTENDED           : t
+    val ANCHORED           : t
+    val DOLLAR_ENDONLY     : t
+    val EXTRA              : t
+    val NOTBOL             : t
+    val NOTEOL             : t
+    val UNGREEDY           : t
+    val NOTEMPTY           : t
+    val UTF8               : t
+    val UTF16              : t
+    val NO_AUTO_CAPTURE    : t
+    val NO_UTF8_CHECK      : t
+    val NO_UTF16_CHECK     : t
+    val AUTO_CALLOUT       : t
+    val PARTIAL_SOFT       : t
+    val PARTIAL            : t
+    val DFA_SHORTEST       : t
+    val DFA_RESTART        : t
+    val FIRSTLINE          : t
+    val DUPNAMES           : t
+    val NEWLINE_CR         : t
+    val NEWLINE_LF         : t
+    val NEWLINE_CRLF       : t
+    val NEWLINE_ANY        : t
+    val NEWLINE_ANYCRLF    : t
+    val BSR_ANYCRLF        : t
+    val BSR_UNICODE        : t
+    val JAVASCRIPT_COMPAT  : t
+    val NO_START_OPTIMIZE  : t
+    val NO_START_OPTIMISE  : t
+    val PARTIAL_HARD       : t
+    val NOTEMPTY_ATSTART   : t
+    val UCP                : t
+  end
+
+  structure ErrorCode = PcreRaw.ErrorCode
+
+  exception Error of ErrorCode.t
+
 (*
   val match : string -> string -> ({msg:string, pos:int}, string list) Either.t
 *)
 
   val version : string
 
+  val fullinfo : (t * extra option * int * 'a ref) -> (int, unit) Either.t
+
+  val capture_count : t -> (int, int) Either.t
+
+  val exec : (t * extra option * string * int * Opt.t) -> string option list
+
+  val compile : (string * Opt.t * table option) -> ({msg:string, pos:int}, t) Either.t
+
+  val match : string -> string -> ({msg:string, pos:int}, string option list) Either.t
+  
+(*
   structure Open =
   struct
     type t = t
     val =~ : string * string -> ({msg:string, pos:int}, string list) Either.t
+	val || : Opt.t * Opt.t -> Opt.t
   end
+*)
 end
+
 

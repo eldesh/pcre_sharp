@@ -7,45 +7,49 @@
  *)
 structure PcreRaw =
 struct
-  (* Options *)
-  val PCRE_CASELESS           = 0wx00000001  (*  Compile  *)
-  val PCRE_MULTILINE          = 0wx00000002  (*  Compile  *)
-  val PCRE_DOTALL             = 0wx00000004  (*  Compile  *)
-  val PCRE_EXTENDED           = 0wx00000008  (*  Compile  *)
-  val PCRE_ANCHORED           = 0wx00000010  (*  Compile, exec, DFA exec  *)
-  val PCRE_DOLLAR_ENDONLY     = 0wx00000020  (*  Compile, used in exec, DFA exec  *)
-  val PCRE_EXTRA              = 0wx00000040  (*  Compile  *)
-  val PCRE_NOTBOL             = 0wx00000080  (*  Exec, DFA exec  *)
-  val PCRE_NOTEOL             = 0wx00000100  (*  Exec, DFA exec  *)
-  val PCRE_UNGREEDY           = 0wx00000200  (*  Compile  *)
-  val PCRE_NOTEMPTY           = 0wx00000400  (*  Exec, DFA exec  *)
-  (*  The next two are also used in exec and DFA exec  *)
-  val PCRE_UTF8               = 0wx00000800  (*  Compile (same as PCRE_UTF16)  *)
-  val PCRE_UTF16              = 0wx00000800  (*  Compile (same as PCRE_UTF8)  *)
-  val PCRE_NO_AUTO_CAPTURE    = 0wx00001000  (*  Compile  *)
-  (*  The next two are also used in exec and DFA exec  *)
-  val PCRE_NO_UTF8_CHECK      = 0wx00002000  (*  Compile (same as PCRE_NO_UTF16_CHECK)  *)
-  val PCRE_NO_UTF16_CHECK     = 0wx00002000  (*  Compile (same as PCRE_NO_UTF8_CHECK)  *)
-  val PCRE_AUTO_CALLOUT       = 0wx00004000  (*  Compile  *)
-  val PCRE_PARTIAL_SOFT       = 0wx00008000  (*  Exec, DFA exec  *)
-  val PCRE_PARTIAL            = 0wx00008000  (*  Backwards compatible synonym  *)
-  val PCRE_DFA_SHORTEST       = 0wx00010000  (*  DFA exec  *)
-  val PCRE_DFA_RESTART        = 0wx00020000  (*  DFA exec  *)
-  val PCRE_FIRSTLINE          = 0wx00040000  (*  Compile, used in exec, DFA exec  *)
-  val PCRE_DUPNAMES           = 0wx00080000  (*  Compile  *)
-  val PCRE_NEWLINE_CR         = 0wx00100000  (*  Compile, exec, DFA exec  *)
-  val PCRE_NEWLINE_LF         = 0wx00200000  (*  Compile, exec, DFA exec  *)
-  val PCRE_NEWLINE_CRLF       = 0wx00300000  (*  Compile, exec, DFA exec  *)
-  val PCRE_NEWLINE_ANY        = 0wx00400000  (*  Compile, exec, DFA exec  *)
-  val PCRE_NEWLINE_ANYCRLF    = 0wx00500000  (*  Compile, exec, DFA exec  *)
-  val PCRE_BSR_ANYCRLF        = 0wx00800000  (*  Compile, exec, DFA exec  *)
-  val PCRE_BSR_UNICODE        = 0wx01000000  (*  Compile, exec, DFA exec  *)
-  val PCRE_JAVASCRIPT_COMPAT  = 0wx02000000  (*  Compile, used in exec  *)
-  val PCRE_NO_START_OPTIMIZE  = 0wx04000000  (*  Compile, exec, DFA exec  *)
-  val PCRE_NO_START_OPTIMISE  = 0wx04000000  (*  Synonym  *)
-  val PCRE_PARTIAL_HARD       = 0wx08000000  (*  Exec, DFA exec  *)
-  val PCRE_NOTEMPTY_ATSTART   = 0wx10000000  (*  Exec, DFA exec  *)
-  val PCRE_UCP                = 0wx20000000  (*  Compile, used in exec, DFA exec  *)
+  structure Opt =
+  struct
+    type t = word
+    (* Options *)
+    val PCRE_CASELESS           = 0wx00000001  (*  Compile  *)
+    val PCRE_MULTILINE          = 0wx00000002  (*  Compile  *)
+    val PCRE_DOTALL             = 0wx00000004  (*  Compile  *)
+    val PCRE_EXTENDED           = 0wx00000008  (*  Compile  *)
+    val PCRE_ANCHORED           = 0wx00000010  (*  Compile, exec, DFA exec  *)
+    val PCRE_DOLLAR_ENDONLY     = 0wx00000020  (*  Compile, used in exec, DFA exec  *)
+    val PCRE_EXTRA              = 0wx00000040  (*  Compile  *)
+    val PCRE_NOTBOL             = 0wx00000080  (*  Exec, DFA exec  *)
+    val PCRE_NOTEOL             = 0wx00000100  (*  Exec, DFA exec  *)
+    val PCRE_UNGREEDY           = 0wx00000200  (*  Compile  *)
+    val PCRE_NOTEMPTY           = 0wx00000400  (*  Exec, DFA exec  *)
+    (*  The next two are also used in exec and DFA exec  *)
+    val PCRE_UTF8               = 0wx00000800  (*  Compile (same as PCRE_UTF16)  *)
+    val PCRE_UTF16              = 0wx00000800  (*  Compile (same as PCRE_UTF8)  *)
+    val PCRE_NO_AUTO_CAPTURE    = 0wx00001000  (*  Compile  *)
+    (*  The next two are also used in exec and DFA exec  *)
+    val PCRE_NO_UTF8_CHECK      = 0wx00002000  (*  Compile (same as PCRE_NO_UTF16_CHECK)  *)
+    val PCRE_NO_UTF16_CHECK     = 0wx00002000  (*  Compile (same as PCRE_NO_UTF8_CHECK)  *)
+    val PCRE_AUTO_CALLOUT       = 0wx00004000  (*  Compile  *)
+    val PCRE_PARTIAL_SOFT       = 0wx00008000  (*  Exec, DFA exec  *)
+    val PCRE_PARTIAL            = 0wx00008000  (*  Backwards compatible synonym  *)
+    val PCRE_DFA_SHORTEST       = 0wx00010000  (*  DFA exec  *)
+    val PCRE_DFA_RESTART        = 0wx00020000  (*  DFA exec  *)
+    val PCRE_FIRSTLINE          = 0wx00040000  (*  Compile, used in exec, DFA exec  *)
+    val PCRE_DUPNAMES           = 0wx00080000  (*  Compile  *)
+    val PCRE_NEWLINE_CR         = 0wx00100000  (*  Compile, exec, DFA exec  *)
+    val PCRE_NEWLINE_LF         = 0wx00200000  (*  Compile, exec, DFA exec  *)
+    val PCRE_NEWLINE_CRLF       = 0wx00300000  (*  Compile, exec, DFA exec  *)
+    val PCRE_NEWLINE_ANY        = 0wx00400000  (*  Compile, exec, DFA exec  *)
+    val PCRE_NEWLINE_ANYCRLF    = 0wx00500000  (*  Compile, exec, DFA exec  *)
+    val PCRE_BSR_ANYCRLF        = 0wx00800000  (*  Compile, exec, DFA exec  *)
+    val PCRE_BSR_UNICODE        = 0wx01000000  (*  Compile, exec, DFA exec  *)
+    val PCRE_JAVASCRIPT_COMPAT  = 0wx02000000  (*  Compile, used in exec  *)
+    val PCRE_NO_START_OPTIMIZE  = 0wx04000000  (*  Compile, exec, DFA exec  *)
+    val PCRE_NO_START_OPTIMISE  = 0wx04000000  (*  Synonym  *)
+    val PCRE_PARTIAL_HARD       = 0wx08000000  (*  Exec, DFA exec  *)
+    val PCRE_NOTEMPTY_ATSTART   = 0wx10000000  (*  Exec, DFA exec  *)
+    val PCRE_UCP                = 0wx20000000  (*  Compile, used in exec, DFA exec  *)
+  end
 
   (* Exec-time and get/set-time error codes *)
 
@@ -184,11 +188,11 @@ struct
 
   val pcre_compile_ptr = (* only for giving the NULL pointer *)
     _import "pcre_compile"
-    : __attribute__((alloc)) (string, int, string ref, int ref, 'a ptr)-> pcre
+    : __attribute__((alloc)) (string, word, string ref, int ref, 'a ptr)-> pcre
    
   val pcre_compile_array =
     _import "pcre_compile"
-    : __attribute__((alloc)) (string, int, string ref, int ref, table)-> pcre
+    : __attribute__((alloc)) (string, word, string ref, int ref, table)-> pcre
 
   fun pcre_compile (pattern, option, err, erroffset, table) =
     case table
@@ -197,11 +201,11 @@ struct
     
   val pcre_compile2_ptr =
     _import "pcre_compile2"
-    : __attribute__((alloc)) (string, int, int ref, string ref, int ref, 'a ptr)-> pcre
+    : __attribute__((alloc)) (string, word, int ref, string ref, int ref, 'a ptr)-> pcre
 
   val pcre_compile2_array =
     _import "pcre_compile2"
-    : __attribute__((alloc)) (string, int, int ref, string ref, int ref, table)-> pcre
+    : __attribute__((alloc)) (string, word, int ref, string ref, int ref, table)-> pcre
 
   fun pcre_compile2 (pattern, option, errorcode, err, erroffset, table) =
     case table
@@ -231,11 +235,11 @@ struct
 
   val pcre_exec =
     _import "pcre_exec"
-    : (pcre, pcre_extra, string, int, int, int, int array, int) -> int;
+    : (pcre, pcre_extra, string, int, int, word, int array, int) -> int;
 
   val pcre_dfa_exec =
     _import "pcre_dfa_exec"
-    : (pcre, pcre_extra, string, int, int, int, int array, int
+    : (pcre, pcre_extra, string, int, int, word, int array, int
         , int array, int) -> int
 
   (**
