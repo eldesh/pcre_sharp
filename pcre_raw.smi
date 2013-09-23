@@ -166,7 +166,7 @@ struct
   *)
 
   val pcre_compile 
-    : string * word * string ref * int ref * word8 vector option -> pcre
+    : string * word * string ref * int ref * table option -> pcre
 
   (* unsafe interfaces.
    * use pcre_compile2
@@ -178,7 +178,7 @@ struct
   *)
 
   val pcre_compile2 
-    : string * word * int ref * string ref * int ref * word8 vector option -> pcre
+    : string * word * int ref * string ref * int ref * table option -> pcre
 
   val pcre_config : int * unit ptr -> int
 
