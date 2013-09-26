@@ -2,6 +2,9 @@ _require "basis.smi"
 _require "ffi.smi"
 _require "pcre_raw.smi"
 _require "either.smi"
+(*
+_require "pcre.sig"
+ *)
 
 structure Pcre =
 struct
@@ -9,7 +12,7 @@ struct
   type extra (= ptr)
   type table (= boxed)
   type t      = pcre
-  
+
   structure Opt =
   struct
     type t (= word)
@@ -58,30 +61,22 @@ struct
 
   exception Error of ErrorCode.t
 
-(*
-  val match : string -> string -> ({msg:string, pos:int}, string list) Either.t
-*)
-
   val version : string
-
-  val fullinfo : (t * extra option * int * 'a ref) -> (int, unit) Either.t
 
   val capture_count : t -> (int, int) Either.t
 
   val exec : (t * extra option * string * int * Opt.t) -> string option list
 
-  val compile : (string * Opt.t * table option) -> ({msg:string, pos:int}, t) Either.t
+  val compile : (string * Opt.t * table option) -> t
 
-  val match : string -> string -> ({msg:string, pos:int}, string option list) Either.t
+  val match : string -> string -> string option list
   
-(*
   structure Open =
   struct
-    type t = t
-    val =~ : string * string -> ({msg:string, pos:int}, string list) Either.t
+    type t (= ptr)
+    val =~ : string * string -> string option list
 	val || : Opt.t * Opt.t -> Opt.t
   end
-*)
 end
 
 

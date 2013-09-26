@@ -117,7 +117,7 @@ struct
     val PCRE_UTF16_ERR4           =  4
   end
 
-(*  Request types for pcre_fullinfo()  *)
+  (*  Request types for pcre_fullinfo()  *)
 
   val PCRE_INFO_OPTIONS         =  0
   val PCRE_INFO_SIZE            =  1

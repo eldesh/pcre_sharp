@@ -4,7 +4,7 @@
  *
  *)
 
-structure Pcre =
+structure Pcre (* :> PCRE *)=
 struct
 local
   structure E = Either
@@ -28,8 +28,6 @@ in
 
   infix =~
   infix ||
-
-  structure ErrorCode = R.ErrorCode
 
   structure Opt =
   struct
@@ -79,6 +77,10 @@ in
     val UCP                = O.PCRE_UCP                (*  Compile, used in exec, DFA exec  *)
   end
 
+  structure ErrorCode = R.ErrorCode
+
+  exception Error of ErrorCode.t
+
   val version = R.pcre_version()
 
   fun fullinfo (re, extra, what, where_) =
@@ -95,8 +97,6 @@ in
       fullinfo (re, NONE, R.PCRE_INFO_CAPTURECOUNT, cnt) >>= (fn _ =>
       E.Right (!cnt))
     end
-
-  exception Error of ErrorCode.t
 
   fun unfoldr f e =
     case f e
@@ -125,17 +125,17 @@ in
                       else SOME $ String.extract (str, from, SOME(to-from))
                     fun go i = if (cnt+1) * 2 <= i then NONE
                                else SOME (ext subject (sub(vec,i), sub(vec,i+1)),i+2)
-                in unfoldr go 0
+                in unfoldr go 2
                 end
               else
-                if ret=R.ErrorCode.PCRE_ERROR_NOMATCH then []
+                if ret=ErrorCode.PCRE_ERROR_NOMATCH then []
                 else
                   case List.find (fn err=> err=ret)
-                            [ R.ErrorCode.PCRE_ERROR_NULL
-                            , R.ErrorCode.PCRE_ERROR_BADOPTION
-                            , R.ErrorCode.PCRE_ERROR_BADMAGIC
-                            , R.ErrorCode.PCRE_ERROR_UNKNOWN_NODE
-                            , R.ErrorCode.PCRE_ERROR_NOMEMORY
+                            [ ErrorCode.PCRE_ERROR_NULL
+                            , ErrorCode.PCRE_ERROR_BADOPTION
+                            , ErrorCode.PCRE_ERROR_BADMAGIC
+                            , ErrorCode.PCRE_ERROR_UNKNOWN_NODE
+                            , ErrorCode.PCRE_ERROR_NOMEMORY
                             ]
                     of SOME code => raise Error code
                      | NONE      => raise Fail "Pcre.exec"
@@ -169,20 +169,22 @@ in
       val ret = R.pcre_compile (pattern, option, errmsg, erroffset, table)
     in
       if Ptr.isNull ret
-      then E.Left {msg= !errmsg, pos= !erroffset}
-      else E.Right ret
+      then raise Fail (!errmsg^":"^(String.extract (pattern, !erroffset, NONE)))
+      else ret
     end
 
   fun match str pattern =
-    case compile (pattern, Opt.EMPTY, NONE)
-      of E.Right regex => E.Right $ exec (regex, NONE, str, 0, Opt.EMPTY) before R.pcre_free regex
-       | E.Left  err   => E.Left err
+    let
+      val regex = compile (pattern, Opt.EMPTY, NONE)
+    in
+      exec (regex, NONE, str, 0, Opt.EMPTY) before R.pcre_free regex
+    end
    
   structure Open =
   struct
     type t = R.t
     fun str =~ re = match str re
-    fun x || y = Option.compose x y
+    fun x || y = Opt.compose x y
   end
   open Open
 end (* local *)
@@ -194,9 +196,8 @@ local
   structure E = Either
   infix =~
   fun println s = print(s^"\n")
-  val test = println o (E.sum (fn _=> "<not match>")
-                              (fn xs=> "match!("^(String.concatWith ","
-                                                    (map (fn x=> getOpt (x,"")) xs))^")"))
+  val test = println o (fn xs=> "match!("^(String.concatWith ","
+                                              (map (fn x=> getOpt (x,"")) xs))^")")
   fun getLineWith prompt () =
     (print (prompt^"> ");
      let val str = valOf (TextIO.inputLine TextIO.stdIn)
@@ -228,4 +229,5 @@ in
     end
     *)
 end
+val _ = main();
 
