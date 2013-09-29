@@ -157,12 +157,6 @@ in
     end
   end
 
-  fun arrayToString arr =
-    concat [ "<"
-           , String.concatWith "," $ unfoldArray Int.toString arr
-           , ">"
-           ]
-
   fun compile (pattern, option, table) =
     let
       val (errmsg, erroffset) = (ref "", ref 0)
