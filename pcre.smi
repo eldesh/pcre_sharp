@@ -65,16 +65,16 @@ struct
 
   val capture_count : t -> (int, int) Either.t
 
-  val exec : (t * extra option * string * int * Opt.t) -> string option list
+  val exec : (t * extra option * string * int * Opt.t) -> string option list option
 
   val compile : (string * Opt.t * table option) -> t
 
-  val match : string -> string -> string option list
+  val match : string -> string -> string option list option
   
   structure Open =
   struct
     type t (= ptr)
-    val =~ : string * string -> string option list
+    val =~ : string * string -> string option list option
 	val || : Opt.t * Opt.t -> Opt.t
   end
 end

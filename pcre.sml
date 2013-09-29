@@ -125,10 +125,10 @@ in
                       else SOME $ String.extract (str, from, SOME(to-from))
                     fun go i = if (cnt+1) * 2 <= i then NONE
                                else SOME (ext subject (sub(vec,i), sub(vec,i+1)),i+2)
-                in unfoldr go 2
+                in SOME (unfoldr go 2)
                 end
               else
-                if ret=ErrorCode.PCRE_ERROR_NOMATCH then []
+                if ret=ErrorCode.PCRE_ERROR_NOMATCH then NONE
                 else
                   case List.find (fn err=> err=ret)
                             [ ErrorCode.PCRE_ERROR_NULL

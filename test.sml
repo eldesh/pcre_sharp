@@ -6,8 +6,12 @@ local
   structure E = Either
   infix =~
   fun println s = print(s^"\n")
-  val test = println o (fn xs=> "match!("^(String.concatWith ","
-                                              (map (fn x=> getOpt (x,"")) xs))^")")
+  fun maybe none f (SOME x) = f x
+    | maybe none _  NONE    = none
+  val test = println o
+             (maybe "not match"
+                    (fn xs => "match!("^(String.concatWith ","
+                                       (map (fn x=> getOpt (x,"")) xs))^")"))
   fun getLineWith prompt () =
     (print (prompt^"> ");
      let val str = valOf (TextIO.inputLine TextIO.stdIn)
